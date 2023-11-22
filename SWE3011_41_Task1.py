@@ -74,6 +74,7 @@ def random_forest(X_train_tfidf, y_train):
     # Train a Random Forest classifier and return the trained model
     clf = RandomForestClassifier()
     clf.fit(X_train_tfidf, y_train)
+    # https://zephyrus1111.tistory.com/249
     #########################################
     return clf
 
@@ -91,6 +92,8 @@ def naive_bayes_classifier(X_train_tfidf, y_train):
     # Train a Multinomial Naive Bayes classifier and return the trained model
     clf = MultinomialNB()
     clf.fit(X_train_tfidf, y_train)
+    # https://todayisbetterthanyesterday.tistory.com/17
+    # https://todayisbetterthanyesterday.tistory.com/18
     #########################################
     return clf
 
@@ -109,6 +112,7 @@ def evaluate_model(clf, X_test_tfidf, y_test):
     # Evaluate the model and print the results
     y_pred = clf.predict(X_test_tfidf)
     accuracy = accuracy_score(y_test, y_pred)
+    # https://datainsider.tistory.com/53
     #########################################
     print(f"Accuracy: {accuracy:.2f}")
     print("Classification Report:")
@@ -119,10 +123,10 @@ X_train, y_train = train_ds['sentence'], train_ds['label']
 X_test, y_test = test_ds['sentence'], test_ds['label']
 X_train_tfidf, X_test_tfidf, vectorizer = transform_data(X_train, X_test)
 
-# clf = logistic_regression(X_train_tfidf, y_train)
+clf = logistic_regression(X_train_tfidf, y_train)
 # clf_rf = random_forest(X_train_tfidf, y_train)
-clf_nb = naive_bayes_classifier(X_train_tfidf, y_train)
+# clf_nb = naive_bayes_classifier(X_train_tfidf, y_train)
 
-# evaluate_model(clf, X_test_tfidf, y_test)
+evaluate_model(clf, X_test_tfidf, y_test)
 # evaluate_model(clf_rf, X_test_tfidf, y_test)
-evaluate_model(clf_nb, X_test_tfidf, y_test)
+# evaluate_model(clf_nb, X_test_tfidf, y_test)
