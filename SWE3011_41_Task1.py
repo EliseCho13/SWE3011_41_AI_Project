@@ -4,9 +4,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
 from datasets import load_dataset
 from sklearn.metrics import accuracy_score, classification_report
+# from sklearn.pipeline import Pipeline
+# from sklearn.model_selection import GridSearchCV
 # import sys
 # print("interpreter path is ", sys.executable)
 # moduleNotFound에러 발생, pip install -U numpy scikit-learn scipy로 해결
+# TODO: hyper-parameter tuning, cross validation
+
 
 train_ds = load_dataset("glue", "sst2", split="train")
 
@@ -16,6 +20,35 @@ test_ds = load_dataset("csv", data_files="./test_dataset.csv")['train']
 # print("train sentences are ", train_ds['sentence'])
 # print("train labels are ", train_ds['label'])
 # labels are positive and negative
+
+# hyperparameters for gridSearch
+# logistic_regression_params = {
+#     'clf__C': [0.001, 0.01, 0.1, 1, 10, 100],
+#     'clf__penalty': ['l1', 'l2']
+# }
+# random_forest_params = {
+#     'clf__n_estimators': [50, 100, 200],
+#     'clf__max_depth': [None, 10, 20, 30],
+#     'clf__min_samples_split': [2, 5, 10],
+#     'clf__min_samples_leaf': [1, 2, 4]
+# }
+# naive_bayes_params = {
+#     'clf__alpha': [0.1, 0.5, 1.0]
+# }
+
+# pipelines for each model
+# logistic_regression_pipeline = Pipeline([
+#     ('vectorizer', TfidfVectorizer()),
+#     ('clf', LogisticRegression())
+# ])
+# random_forest_pipeline = Pipeline([
+#     ('vectorizer', TfidfVectorizer()),
+#     ('clf', RandomForestClassifier())
+# ])
+# naive_bayes_pipeline = Pipeline([
+#     ('vectorizer', TfidfVectorizer()),
+#     ('clf', MultinomialNB())
+# ])
 
 
 def transform_data(X_train, X_test):
