@@ -86,7 +86,10 @@ def logistic_regression(X_train_tfidf, y_train):
     """
     #########################################
     # Train a logistic regression model and return the trained model
-    clf = LogisticRegression()
+    clf = LogisticRegression(C=1, solver='lbfgs', penalty=None,
+                             max_iter=1000)
+    # solver: lbfgs, liblinear, newton-cg, sag, saga were all same. But, newton-cholesky was unable to execute.
+    # penalty: l1 - 0.73, l2 - 0.79 (liblinear)
     clf.fit(X_train_tfidf, y_train)
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression
     # https://velog.io/@gayeon/%EB%8D%B0%EC%9D%B4%ED%84%B0-%EB%B6%84%EC%84%9D-%EC%B4%88%EB%B3%B4%EC%9E%90%EB%A5%BC-%EC%9C%84%ED%95%9C-Logistic-Regression-with-Scikit-Learn
@@ -105,7 +108,7 @@ def random_forest(X_train_tfidf, y_train):
     """
     #########################################
     # Train a Random Forest classifier and return the trained model
-    clf = RandomForestClassifier()
+    clf = RandomForestClassifier(n_estimators=1000, max_depth=2)
     clf.fit(X_train_tfidf, y_train)
     # https://zephyrus1111.tistory.com/249
     #########################################
