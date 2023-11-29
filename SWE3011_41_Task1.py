@@ -1,14 +1,15 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.naive_bayes import MultinomialNB
-from datasets import load_dataset
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report
+from datasets import load_dataset
 
 # import sys
 # print("interpreter path is ", sys.executable) #python 설치 위치 확인
 # moduleNotFound에러 발생, pip install -U numpy scikit-learn scipy로 해결
 
+# Load datasets
 train_ds = load_dataset("glue", "sst2", split="train")
 test_ds = load_dataset("csv", data_files="./test_dataset.csv")['train']
 
