@@ -5,47 +5,109 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, classification_report
 from datasets import load_dataset
 
+# import sys
+# print("interpreter path is ", sys.executable) #python 설치 위치 확인
+# moduleNotFound에러 발생, pip install -U numpy scikit-learn scipy로 해결
+
 # Load datasets
 train_ds = load_dataset("glue", "sst2", split="train")
 test_ds = load_dataset("csv", data_files="./test_dataset.csv")['train']
 
-# Extract features and labels
+
+def transform_data(X_train, X_test):
+    """
+    Input:
+    - X_train, X_test: Series containing the text data for training and testing respectively.
+
+    Output:
+    - X_train_tfidf, X_test_tfidf: Transformed text data in TF-IDF format for training and testing respectively.
+    - vectorizer: Fitted TfidfVectorizer object.
+    """
+    #########################################
+    vectorizer = TfidfVectorizer()
+    X_train_tfidf = vectorizer.fit_transform(X_train)
+    # print("\nX_train_tfidf is \n", X_train_tfidf.toarray())
+    X_test_tfidf = vectorizer.transform(X_test)
+    #########################################
+    return X_train_tfidf, X_test_tfidf, vectorizer
+
+
+def logistic_regression(X_train_tfidf, y_train):
+    """
+    Input:
+    - X_train_tfidf: Transformed text data in TF-IDF format for training.
+    - y_train: Series containing the labels for training.
+
+    Output:
+    - clf: Trained Logistic Regression model.
+    """
+    #########################################
+    clf = LogisticRegression(C=1, solver='lbfgs', penalty='l2', max_iter=1000)
+    clf.fit(X_train_tfidf, y_train)
+    #########################################
+    return clf
+
+
+def random_forest(X_train_tfidf, y_train):
+    """
+    Input:
+    - X_train_tfidf: Transformed text data in TF-IDF format for training.
+    - y_train: Series containing the labels for training.
+
+    Output:
+    - clf: Trained Random Forest classifier.
+    """
+    #########################################
+    clf = RandomForestClassifier(
+        n_estimators=100, max_depth=None, min_samples_leaf=4, min_samples_split=2, n_jobs=-1)
+    clf.fit(X_train_tfidf, y_train)
+    #########################################
+    return clf
+
+
+def naive_bayes_classifier(X_train_tfidf, y_train):
+    """
+    Input:
+    - X_train_tfidf: Transformed text data in TF-IDF format for training.
+    - y_train: Series containing the labels for training.
+
+    Output:
+    - clf: Trained Multinomial Naive Bayes classifier.
+    """
+    #########################################
+    clf = MultinomialNB(alpha=1.0)  # 0.1, 0.5, 1.0
+    clf.fit(X_train_tfidf, y_train)
+    #########################################
+    return clf
+
+
+def evaluate_model(clf, X_test_tfidf, y_test):
+    """
+    Input:
+    - clf: Trained Logistic Regression model.
+    - X_test_tfidf: Transformed text data in TF-IDF format for testing.
+    - y_test: Series containing the labels for testing.
+
+    Output:
+    - None (This function will print the evaluation results.)
+    """
+    #########################################
+    y_pred = clf.predict(X_test_tfidf)
+    accuracy = accuracy_score(y_test, y_pred)
+    #########################################
+    print(f"Accuracy: {accuracy:.2f}")
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred))
+
+
 X_train, y_train = train_ds['sentence'], train_ds['label']
 X_test, y_test = test_ds['sentence'], test_ds['label']
+X_train_tfidf, X_test_tfidf, vectorizer = transform_data(X_train, X_test)
 
-# Create a pipeline with TfidfVectorizer and RandomForestClassifier
-random_forest_pipeline = Pipeline([
-    ('vectorizer', TfidfVectorizer()),
-    ('clf', RandomForestClassifier())
-])
+clf = logistic_regression(X_train_tfidf, y_train)
+# clf_rf = random_forest(X_train_tfidf, y_train)
+# clf_nb = naive_bayes_classifier(X_train_tfidf, y_train)
 
-# Define the parameters for GridSearchCV
-random_forest_params = {
-    # 'vectorizer__analyzer': ['word', 'char', 'char_wb'],
-    'vectorizer__ngram_range': [(1, 1), (1, 2)],
-    'clf__n_estimators': [10, 100],
-    'clf__max_depth': [6, 8, 10, 12],
-    'clf__min_samples_leaf': [8, 12, 18],
-    # 'clf__min_samples_split': [8, 16, 20]
-}
-
-# GridSearchCV
-grid_cv = GridSearchCV(
-    random_forest_pipeline, param_grid=random_forest_params, cv=3, n_jobs=-1)
-grid_cv.fit(X_train, y_train)
-
-# Print the results
-print('Best Hyperparameters: ', grid_cv.best_params_)
-print('Best Accuracy: {:.4f}'.format(grid_cv.best_score_))
-
-# Get the best model from the grid search
-best_random_forest_model = grid_cv.best_estimator_
-
-# Evaluate the best model on the test set
-X_test_tfidf = best_random_forest_model.named_steps['vectorizer'].transform(
-    X_test)
-y_pred = best_random_forest_model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Test Accuracy: {accuracy:.4f}")
-print("Classification Report:")
-print(classification_report(y_test, y_pred))
+evaluate_model(clf, X_test_tfidf, y_test)
+# evaluate_model(clf_rf, X_test_tfidf, y_test)
+# evaluate_model(clf_nb, X_test_tfidf, y_test)
